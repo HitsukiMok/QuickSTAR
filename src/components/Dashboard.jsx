@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sun, Moon, ArrowLeft, RotateCcw } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import MapPlaceholder from './MapPlaceholder';
 import Chatbot from './Chatbot';
@@ -15,11 +15,10 @@ const COLORS = {
   Science: '#9333ea', // purple-600
 };
 
-// Generic extensive palette for regions
+// 17 highly distinct colors for Regions
 const REGION_COLORS = [
-  '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
-  '#f472b6', '#a78bfa', '#60a5fa', '#34d399', '#fbbf24', '#f87171',
-  '#db2777', '#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626'
+  '#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6',
+  '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000'
 ];
 
 // Custom Tooltip for Subject Chart
@@ -130,18 +129,21 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
   return (
     <div className="min-h-screen pb-12 animate-in fade-in duration-500">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-purple-600 dark:bg-purple-900 text-white shadow-md">
+      <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-[#111822] text-slate-800 dark:text-white shadow-sm border-b border-purple-100 dark:border-slate-800">
         <div className="flex items-center space-x-4">
-          <button onClick={() => navigate('/')} className="hover:bg-purple-500 p-2 rounded-full transition-colors">
+          <button onClick={() => navigate('/')} className="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors text-slate-500 dark:text-slate-400">
             <ArrowLeft size={20} />
           </button>
-          <div className="w-8 h-8 rounded-full bg-slate-300 dark:bg-slate-600"></div> {/* Logo Placeholder */}
-          <h1 className="text-2xl font-bold tracking-wide">QuickSTAR</h1>
+          <div className="w-10 h-10 rounded-full bg-[#4e4d82] flex items-center justify-center shadow-sm">
+            <span className="text-[#e0b234]">✨</span>
+          </div> {/* Logo Placeholder upgraded */}
+          <Link to="/" className="text-2xl font-bold tracking-wide text-[#4e4d82] dark:text-slate-200 transition-colors">
+            Quick<span className="text-[#e0b234]">STAR</span>
+          </Link>
         </div>
         <div className="flex items-center space-x-6">
-          <span className="font-semibold">Dashboard</span>
-          <button onClick={toggleDarkMode} className="hover:bg-purple-500 p-2 rounded-full transition-colors">
-            {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+          <button onClick={toggleDarkMode} className="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors text-slate-500 dark:text-slate-400">
+            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
       </header>
@@ -151,13 +153,13 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
         
         {/* Selected Region / Reset */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-700 dark:text-slate-200">
+          <h2 className="text-xl font-bold text-[#3a3959] dark:text-slate-200">
             {selectedRegion ? `Showing data for: ${selectedRegion}` : "Nationwide Overview"}
           </h2>
           {selectedRegion && (
             <button 
               onClick={() => setSelectedRegion(null)}
-              className="flex items-center space-x-2 text-sm font-semibold bg-pink-100 hover:bg-pink-200 text-pink-600 dark:bg-pink-900/30 dark:hover:bg-pink-900/50 dark:text-pink-400 py-1.5 px-3 rounded-full transition-colors"
+              className="flex items-center space-x-2 text-sm font-semibold bg-[#e6e6f2] hover:bg-[#d0d0e6] text-[#4e4d82] dark:bg-[#151726] dark:hover:bg-slate-800 dark:text-[#a5a5c7] py-1.5 px-3 rounded-full transition-all duration-300 hover:shadow-sm"
             >
               <RotateCcw size={16} />
               <span>Reset Filters</span>
@@ -171,27 +173,27 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
           {/* Left Column: Metrics & Charts */}
           <div className="space-y-8">
             {/* KPI Cards */}
-            <div className="grid grid-cols-3 gap-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-purple-100 dark:border-purple-900/50">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-800 dark:text-purple-300 mb-1">{isLoading ? "..." : currentProfiles.toLocaleString()}</div>
-                <div className="text-sm font-medium text-slate-500">Current Profiles</div>
+            <div className="grid grid-cols-3 gap-4 bg-white dark:bg-[#151726] p-6 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="text-center group">
+                <div className="text-3xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? "..." : currentProfiles.toLocaleString()}</div>
+                <div className="text-sm font-medium text-[#8685ab] dark:text-slate-500">Current Profiles</div>
               </div>
-              <div className="text-center border-l border-r border-purple-100 dark:border-slate-700">
-                <div className="text-3xl font-bold text-purple-800 dark:text-purple-300 mb-1">{isLoading ? "..." : supportedRegions.toLocaleString()}</div>
-                <div className="text-sm font-medium text-slate-500">Supported Regions</div>
+              <div className="text-center border-l border-r border-[#f0f0f5] dark:border-slate-800 group">
+                <div className="text-3xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? "..." : supportedRegions.toLocaleString()}</div>
+                <div className="text-sm font-medium text-[#8685ab] dark:text-slate-500">Supported Regions</div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-800 dark:text-purple-300 mb-1">{isLoading ? "..." : starStaff.toLocaleString()}</div>
-                <div className="text-sm font-medium text-slate-500">STAR Staff</div>
+              <div className="text-center group">
+                <div className="text-3xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? "..." : starStaff.toLocaleString()}</div>
+                <div className="text-sm font-medium text-[#8685ab] dark:text-slate-500">STAR Staff</div>
               </div>
             </div>
 
             {/* Charts Area */}
-            <div className="grid grid-cols-2 gap-4 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-purple-100 dark:border-purple-900/50 h-[350px]">
+            <div className="grid grid-cols-2 gap-4 bg-white dark:bg-[#151726] p-6 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 h-[350px] hover:shadow-md transition-all duration-300 hover:-translate-y-1">
               
               {/* Subject Chart */}
-              <div className="flex flex-col items-center justify-between h-full">
-                <div className="h-[250px] w-full">
+              <div className="flex flex-col items-center justify-between h-full group">
+                <div className="h-[250px] w-full group-hover:scale-105 transition-transform duration-500">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -209,12 +211,12 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <h3 className="font-semibold text-purple-800 dark:text-purple-300 text-center">Subject Distribution</h3>
+                <h3 className="font-bold text-[#4e4d82] dark:text-[#a5a5c7] text-center mt-2">Subject Distribution</h3>
               </div>
 
               {/* Region Chart */}
-              <div className="flex flex-col items-center justify-between h-full">
-                <div className="h-[250px] w-full">
+              <div className="flex flex-col items-center justify-between h-full group">
+                <div className="h-[250px] w-full group-hover:scale-105 transition-transform duration-500">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -236,13 +238,13 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <h3 className="font-semibold text-purple-800 dark:text-purple-300 text-center">Teacher Distribution in Regions</h3>
+                <h3 className="font-bold text-[#4e4d82] dark:text-[#a5a5c7] text-center mt-2">Teacher Distribution in Regions</h3>
               </div>
             </div>
           </div>
 
           {/* Right Column: Map */}
-          <div>
+          <div className="hover:-translate-y-1 transition-transform duration-300">
             <MapPlaceholder selectedRegion={selectedRegion} setSelectedRegion={setSelectedRegion} />
           </div>
 
@@ -250,34 +252,34 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
 
         {/* Analytics Section */}
         <div className="mt-12 animate-in slide-in-from-bottom-8 duration-700">
-           <h2 className="text-3xl font-bold text-purple-900 dark:text-purple-300 mb-6 border-b-2 border-purple-600 inline-block pb-1">Analytics</h2>
+           <h2 className="text-3xl font-black text-[#3a3959] dark:text-[#a5a5c7] mb-6 border-b-4 border-[#6564a3] inline-block pb-2">Analytics</h2>
            
            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-purple-100 dark:border-purple-900 hover:shadow-md transition-shadow">
-               <h3 className="text-lg font-bold text-pink-600 dark:text-pink-400 mb-4">Data Says...</h3>
-               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+             <div className="bg-[#fbfcff] dark:bg-[#151726] p-8 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+               <h3 className="text-xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-4">Data Says...</h3>
+               <p className="text-[#68678c] dark:text-slate-400 leading-relaxed">
                  There is a high concentration of Senior High School teachers specializing in Earth Science within the NCR and Region IV-A. Conversely, regions like BARMM show lower total profiles particularly in Math disciplines such as Calculus. 
                </p>
              </div>
              
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-purple-100 dark:border-purple-900 hover:shadow-md transition-shadow">
-               <h3 className="text-lg font-bold text-purple-600 dark:text-purple-400 mb-4">Possible Reason</h3>
-               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+             <div className="bg-[#fbfcff] dark:bg-[#151726] p-8 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+               <h3 className="text-xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-4">Possible Reason</h3>
+               <p className="text-[#68678c] dark:text-slate-400 leading-relaxed">
                  Urban centers attract highly specialized educators due to more concentrated Senior High School facilities. Rural or newly formed regions face systemic barriers in retaining educators with advanced mathematical specializations.
                </p>
              </div>
            </div>
 
-           <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-purple-100 dark:border-purple-900 hover:shadow-md transition-shadow mb-4">
-             <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mb-4">Possible Actions</h3>
-             <ul className="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed">
+           <div className="bg-white dark:bg-[#1a1c2e] p-8 rounded-3xl shadow-md border border-[#e6e6f2] dark:border-slate-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 mb-4 bg-gradient-to-br from-white to-[#f4f4f9] dark:from-[#1a1c2e] dark:to-[#151726]">
+             <h3 className="text-xl font-black text-[#3a3959] dark:text-[#a5a5c7] mb-4">Possible Actions</h3>
+             <ul className="list-disc list-inside text-[#68678c] dark:text-slate-400 space-y-3 leading-relaxed">
                <li>Deploy dedicated Math capacity-building workshops tailored for BARMM and Region XIII.</li>
                <li>Leverage the surplus of Science specialists in NCR to lead virtual training modules nationwide.</li>
                <li>Increase incentives for BS Math/Science with CPE certificate holders to relocate to underserved areas.</li>
              </ul>
            </div>
            
-           <p className="text-xs text-slate-400 dark:text-slate-500 px-4">
+           <p className="text-xs font-semibold text-[#a5a5bf] dark:text-slate-500 px-4 mt-6">
              * These data analytics are generated by an AI Model to provide insights to the current situation
            </p>
         </div>
