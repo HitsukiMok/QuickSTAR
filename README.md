@@ -59,6 +59,23 @@ The system processes sensitive teacher and regional datasets, requiring secure d
 
 ---
 
+
+## UI Screenshot
+### Landing Page
+<img width="1837" height="873" alt="image" src="https://github.com/user-attachments/assets/50157e0d-f6ce-4a69-a109-a6204ee63685" />
+
+
+### About Section
+<img width="1512" height="850" alt="image" src="https://github.com/user-attachments/assets/abc43466-a88b-4421-a596-eb9684f9ef15" />
+
+
+### Dashboard Interface
+
+
+
+---
+
+
 ##  File Structure
 
 ```text
