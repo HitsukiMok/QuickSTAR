@@ -3,6 +3,7 @@ import sqlite3
 import os
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 import json
 
 app = FastAPI()
@@ -14,6 +15,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 DB_FILE = "quickstar.db"
 CSV_FILE = "doststar_nationwide_dataset-TEST.csv"
