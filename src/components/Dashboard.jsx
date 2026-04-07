@@ -108,23 +108,16 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
     ].filter(d => d.value > 0);
   }, [filteredData]);
 
-  // Compute Region Distribution
+  // Compute Region Distribution — always national (rawData), never filtered
   const regionData = useMemo(() => {
-    // If a region is selected, pie chart should just show that region 100% or we retain full breakdown?
-    // Let's show full breakdown to allow cross-filtering properly. Using rawData for Region Donut keeps it interactive.
-    // Wait, the user said "If a user clicks a slice in the Teacher Distribution pie chart, all other cards... must filter".
-    // So pie chart acts as a filter. If filter is active, should pie chart contract to 1 slice? Usually yes, or stay the same and highlight.
-    // Let's filter region pie chart to only the selected region if selected to match standard dashboard mechanics.
-    const dataToUse = selectedRegion ? filteredData : rawData;
     const counts = {};
-    dataToUse.forEach(d => {
+    rawData.forEach(d => {
       counts[d.region] = (counts[d.region] || 0) + 1;
     });
-    
     return Object.entries(counts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
-  }, [rawData, filteredData, selectedRegion]);
+  }, [rawData]);
 
   return (
     <div className="min-h-screen pb-12 animate-in fade-in duration-500">
@@ -226,7 +219,7 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
                         paddingAngle={1}
                         dataKey="value"
                         onClick={(data) => {
-                           if(data.name) setSelectedRegion(selectedRegion === data.name ? null : data.name);
+                           if(data.name) setSelectedRegion(prev => prev === data.name ? null : data.name);
                         }}
                         className="cursor-pointer"
                       >
@@ -245,7 +238,16 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
 
           {/* Right Column: Map */}
           <div className="hover:-translate-y-1 transition-transform duration-300">
-            <MapPlaceholder selectedRegion={selectedRegion} setSelectedRegion={setSelectedRegion} />
+            {isLoading ? (
+              <div className="w-full h-[600px] bg-[#f8f8fc] dark:bg-[#151726] rounded-3xl overflow-hidden border border-[#e6e6f2] dark:border-slate-800 shadow-sm flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-10 h-10 border-4 border-[#c8c7e8] border-t-[#4e4d82] rounded-full animate-spin" />
+                  <span className="text-sm font-medium text-[#8685ab] dark:text-slate-400">Loading map data...</span>
+                </div>
+              </div>
+            ) : (
+              <MapPlaceholder selectedRegion={selectedRegion} setSelectedRegion={setSelectedRegion} allData={rawData} />
+            )}
           </div>
 
         </div>
