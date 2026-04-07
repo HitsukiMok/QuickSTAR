@@ -201,12 +201,22 @@ export default function MapPlaceholder({ selectedRegion, setSelectedRegion, allD
         }
       }
       
-      // If loaded already but new data, refresh
       if (window.simplemaps_countrymap) {
-         window.simplemaps_countrymap.refresh();
+         // Force load if not loaded, otherwise refresh
+         if (document.querySelector('#simplemaps-ph-map svg')) {
+           window.simplemaps_countrymap.refresh();
+         } else {
+           window.simplemaps_countrymap.load();
+         }
       } else {
         await new Promise(res => {
-          const t = setInterval(() => { if (window.simplemaps_countrymap) { clearInterval(t); res(); } }, 50);
+          const t = setInterval(() => { 
+            if (window.simplemaps_countrymap) { 
+              clearInterval(t); 
+              window.simplemaps_countrymap.load();
+              res(); 
+            } 
+          }, 50);
         });
       }
       
