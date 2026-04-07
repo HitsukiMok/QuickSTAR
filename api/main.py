@@ -15,7 +15,7 @@ app.add_middleware(
 )
 
 DB_FILE = "quickstar.db"
-CSV_FILE = "doststar_nationwide_dataset-TEST copy.csv"
+CSV_FILE = "dost_star_nationwide_dataset.csv"
 
 
 def init_db():
