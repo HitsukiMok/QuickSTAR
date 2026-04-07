@@ -1,6 +1,12 @@
-# QuickSTAR Dashboard
+<img width="1828" height="869" alt="image" src="https://github.com/user-attachments/assets/e95b2620-fd2a-4714-a701-4a4bb15427d6" />
 
-Welcome to the **QuickSTAR Dashboard** repository, a unified, intelligent platform that centralizes fragmented DOST STAR teacher data into actionable insights to power strategic decision-making.
+
+# QuickSTAR
+
+Welcome to the **QuickSTAR Dashboard**, a unified, intelligent platform that centralizes fragmented DOST STAR teacher data into actionable insights to power strategic decision-making.
+
+
+**Link to the Prototype Preview:** https://quick-star-dost.vercel.app/
 
 ---
 
@@ -10,6 +16,9 @@ To empower the DOST STAR Program and create actionable, data-driven insights for
 
 > [!IMPORTANT]
 > **Prototype Disclaimer (AI Integration):** QuickSTAR is currently implemented as a functional MVP for hackathon demonstration. While the backend database ingestion, interactive geospatial map, and deep-dive analytics engines are completely functional and actively process the real 126k+ row dataset (this dataset is also a mock version for testing.), **the AI-driven intelligence layer (the "Data Says" feature, semantic insights, and Chatbot) is currently conceptual and mocked.** These mock implementations serve to vividly demonstrate the intended final user experience, showcasing how the ecosystem will eventually integrate a live LLM model to translate cold data into direct, actionable policy steps for administrators.
+
+
+> It's also great to note that the login & signup pages are **just mock ups**. Feel free to input anything in the Email section (as long as it includes "@" followed by a letter) and any password to access the dashboard.
 
 ---
 
@@ -71,8 +80,29 @@ The system processes sensitive teacher and regional datasets, requiring secure d
 ### About Section
 <img width="1512" height="850" alt="About Section" src="https://github.com/user-attachments/assets/abc43466-a88b-4421-a596-eb9684f9ef15" />
 
-### Dashboard Interface (Analytics & Regional Map)
-*(Insert your newest local screenshot showing the map and Deep Dive Analytics here)*
+### Login and Signup
+<img width="1865" height="876" alt="image" src="https://github.com/user-attachments/assets/51c5267a-d6dc-4a4c-b154-82cccd5278c8" />
+<img width="1838" height="881" alt="image" src="https://github.com/user-attachments/assets/c4663a79-2ca0-4727-8dd2-0a8887d3b7c5" />
+
+
+**These pages are NOT FUNCTIONAL, you can proceed to input anything in the email and password section to grant you access to the dashboard.**
+
+### Dashboard
+
+
+#### Data overview and Regional Map Filter
+<img width="1813" height="862" alt="Map and data overview" src="https://github.com/user-attachments/assets/92db1a78-ecd0-4cdc-9450-e213adb7b8ff" />
+
+
+#### More Analytics & Data visualization
+<img width="1647" height="631" alt="waterfall chart and qualification area" src="https://github.com/user-attachments/assets/9d4c381e-6c4c-4d3b-8fbe-cfe3a8f43323" />
+<img width="1677" height="542" alt="sdo distribution" src="https://github.com/user-attachments/assets/deb7ba0f-7df2-4f9c-a70f-9b033d7c4ddc" />
+
+
+#### Analytical Insights (AI-integrated) & ChatBot
+<img width="1778" height="824" alt="analysis and chatbot" src="https://github.com/user-attachments/assets/db2a74db-0696-4e77-8322-0bb1bc52470f" />
+
+
 
 ---
 
