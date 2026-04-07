@@ -63,6 +63,7 @@ The system processes sensitive teacher and regional datasets, requiring secure d
 ---
 
 
+<<<<<<< HEAD
 ## UI Screenshots
 
 ### Landing Page
@@ -73,6 +74,20 @@ The system processes sensitive teacher and regional datasets, requiring secure d
 
 ### Dashboard Interface (Analytics & Regional Map)
 *(Insert your newest local screenshot showing the map and Deep Dive Analytics here)*
+=======
+## UI Screenshot
+### Landing Page
+<img width="1837" height="873" alt="image" src="https://github.com/user-attachments/assets/50157e0d-f6ce-4a69-a109-a6204ee63685" />
+
+
+### About Section
+<img width="1512" height="850" alt="image" src="https://github.com/user-attachments/assets/abc43466-a88b-4421-a596-eb9684f9ef15" />
+
+
+### Dashboard Interface
+
+
+>>>>>>> 468df4548bb8e530469ff9ba65de192cedbd8fc4
 
 ---
 
