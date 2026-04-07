@@ -182,15 +182,22 @@ export default function MapPlaceholder({ selectedRegion, setSelectedRegion, allD
     // Inject the fully computed stats on boot so it never displays any loading sequences!
     window.simplemaps_countrymap_mapdata = buildMapConfig(regionStats);
 
+    const loadScript = src => new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = src; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+
     let observer = null;
 
     (async () => {
       if (!scriptLoaded) {
         try {
-          await import('../assets/map/countrymap.js');
+          await loadScript('/map/countrymap.js');
           scriptLoaded = true;
         } catch (e) {
-          console.error("Failed to load map bundle natively:", e);
+          console.error("Failed to load map bundle:", e);
         }
       }
       
