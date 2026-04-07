@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Sun, Moon, ArrowLeft, RotateCcw } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import MapPlaceholder from './MapPlaceholder';
 import Chatbot from './Chatbot';
 
@@ -55,6 +55,45 @@ const RegionTooltip = ({ active, payload }) => {
   return null;
 };
 
+// Custom Tooltip for Generic Bar Charts
+const GenericTooltip = ({ active, payload, label, dataKeyLabel }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white dark:bg-slate-800 p-3 rounded-lg shadow-lg border border-purple-100 dark:border-purple-900 text-sm">
+        <p className="font-bold text-slate-800 dark:text-pink-50 mb-1">{data.name || label}</p>
+        <p className="text-[#9333ea] dark:text-[#a855f7] font-medium">{dataKeyLabel || 'Count'}: {data.value || data.joined}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+// Custom Tooltip for Waterfall Chart
+const WaterfallTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length > 1) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-[#1e2235] p-3 rounded-lg shadow-xl border border-[#4e4d82] text-sm font-sans tracking-wide">
+        <p className="font-bold text-[#e0b234] mb-2">Year: {label}</p>
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-[#8685ab] mr-4">Previous Total:</span>
+          <span className="text-[#a5a5c7] font-medium">{data.base.toLocaleString()}</span>
+        </div>
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-[#a855f7] mr-4">New Teachers Joined:</span>
+          <span className="text-[#d8b4fe] font-bold">+{data.joined.toLocaleString()}</span>
+        </div>
+        <div className="flex justify-between items-center border-t border-[#3a3959] pt-2 mt-2">
+          <span className="text-[#c8c7e8] mr-4 font-semibold">New Total:</span>
+          <span className="text-white font-bold">{data.totalAfter.toLocaleString()}</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function Dashboard({ darkMode, toggleDarkMode }) {
   const navigate = useNavigate();
   const [rawData, setRawData] = useState([]);
@@ -83,6 +122,56 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
   const currentProfiles = filteredData.length;
   const supportedRegions = new Set(filteredData.map(d => d.region)).size;
   const starStaff = currentProfiles * 5;
+
+  const avgExperience = useMemo(() => {
+    if (filteredData.length === 0) return 0;
+    const total = filteredData.reduce((acc, d) => acc + (d.years_of_experience || 0), 0);
+    return (total / filteredData.length).toFixed(1);
+  }, [filteredData]);
+  
+  const sdoData = useMemo(() => {
+    const counts = {};
+    filteredData.forEach(d => {
+      if (d.sdo) counts[d.sdo] = (counts[d.sdo] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10);
+  }, [filteredData]);
+  
+  const qualificationsData = useMemo(() => {
+    const counts = {};
+    filteredData.forEach(d => {
+      if (d.qualifications) counts[d.qualifications] = (counts[d.qualifications] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [filteredData]);
+
+  const waterfallData = useMemo(() => {
+    const countsByYear = {};
+    filteredData.forEach(d => {
+      const y = parseInt(d.year_joined, 10);
+      if (!isNaN(y) && y > 1950 && y <= new Date().getFullYear()) {
+        countsByYear[y] = (countsByYear[y] || 0) + 1;
+      }
+    });
+    const sortedYears = Object.keys(countsByYear).map(Number).sort((a, b) => a - b);
+    let runningTotal = 0;
+    return sortedYears.map(year => {
+      const count = countsByYear[year];
+      const entry = { 
+        name: year.toString(), 
+        base: runningTotal, 
+        joined: count, 
+        totalAfter: runningTotal + count 
+      };
+      runningTotal += count;
+      return entry;
+    });
+  }, [filteredData]);
 
   // Compute Subject Distribution
   const subjectData = useMemo(() => {
@@ -166,18 +255,22 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
           {/* Left Column: Metrics & Charts */}
           <div className="space-y-8">
             {/* KPI Cards */}
-            <div className="grid grid-cols-3 gap-4 bg-white dark:bg-[#151726] p-6 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-              <div className="text-center group">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white dark:bg-[#151726] p-6 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <div className="text-center group border-r border-[#f0f0f5] dark:border-slate-800">
                 <div className="text-3xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? "..." : currentProfiles.toLocaleString()}</div>
                 <div className="text-sm font-medium text-[#8685ab] dark:text-slate-500">Current Profiles</div>
               </div>
-              <div className="text-center border-l border-r border-[#f0f0f5] dark:border-slate-800 group">
+              <div className="text-center group md:border-r border-[#f0f0f5] dark:border-slate-800">
                 <div className="text-3xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? "..." : supportedRegions.toLocaleString()}</div>
                 <div className="text-sm font-medium text-[#8685ab] dark:text-slate-500">Supported Regions</div>
               </div>
-              <div className="text-center group">
+              <div className="text-center group border-r border-[#f0f0f5] dark:border-slate-800">
                 <div className="text-3xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? "..." : starStaff.toLocaleString()}</div>
                 <div className="text-sm font-medium text-[#8685ab] dark:text-slate-500">STAR Staff</div>
+              </div>
+              <div className="text-center group">
+                <div className="text-3xl font-black text-[#4e4d82] dark:text-[#a5a5c7] mb-1 group-hover:scale-110 transition-transform duration-300">{isLoading ? "..." : `${avgExperience}`}</div>
+                <div className="text-sm font-medium text-[#8685ab] dark:text-slate-500">Avg Exp (Yrs)</div>
               </div>
             </div>
 
@@ -250,6 +343,108 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
             )}
           </div>
 
+        </div>
+
+        {/* NEW ANALYTICS SECTION */}
+        <div className="mt-8 animate-in slide-in-from-bottom-4 duration-700">
+          <h2 className="text-2xl font-black text-[#3a3959] dark:text-[#a5a5c7] mb-6 inline-block">Deep Dive Analytics</h2>
+          
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            
+            {/* Waterfall Chart: Spans 2 columns */}
+            <div className="col-span-1 xl:col-span-2 bg-white dark:bg-[#151726] p-6 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-[400px]">
+              <h3 className="font-bold text-[#4e4d82] dark:text-[#a5a5c7] mb-4 tracking-wide">Growth Over Time (Waterfall)</h3>
+              <div className="flex-1 w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={waterfallData} margin={{ top: 10, right: 10, left: 20, bottom: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#3a3959" opacity={0.3} />
+                    <XAxis 
+                      dataKey="name" 
+                      tick={{ fill: '#8685ab', fontSize: 12 }} 
+                      axisLine={false} 
+                      tickLine={false}
+                      dy={10}
+                    />
+                    <YAxis 
+                      tick={{ fill: '#8685ab', fontSize: 12 }} 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tickFormatter={(val) => val >= 1000 ? `${(val/1000).toFixed(0)}k` : val}
+                    />
+                    <Tooltip content={<WaterfallTooltip />} cursor={{ fill: 'transparent' }} />
+                    <Bar dataKey="base" stackId="a" fill="transparent" />
+                    <Bar dataKey="joined" stackId="a" fill="url(#colorWaterfall)" radius={[2, 2, 0, 0]} />
+                    <defs>
+                      <linearGradient id="colorWaterfall" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#e0b234" stopOpacity={0.9}/>
+                        <stop offset="95%" stopColor="#9333ea" stopOpacity={0.7}/>
+                      </linearGradient>
+                    </defs>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Qualifications Chart */}
+            <div className="col-span-1 bg-white dark:bg-[#151726] p-6 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-[400px]">
+              <h3 className="font-bold text-[#4e4d82] dark:text-[#a5a5c7] mb-4 tracking-wide">Teacher Qualifications</h3>
+              <div className="flex-1 w-full pl-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={qualificationsData} layout="vertical" margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
+                    <XAxis type="number" hide />
+                    <YAxis 
+                      type="category" 
+                      dataKey="name" 
+                      tick={{ fill: '#8685ab', fontSize: 11 }} 
+                      axisLine={false} 
+                      tickLine={false}
+                      width={100}
+                    />
+                    <Tooltip content={<GenericTooltip dataKeyLabel="Teachers" />} cursor={{ fill: '#3a3959', opacity: 0.1 }} />
+                    <Bar dataKey="value" fill="#9333ea" radius={[0, 4, 4, 0]}>
+                      {qualificationsData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#9333ea' : '#e0b234'} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* SDO Distribution Chart */}
+            <div className="col-span-1 xl:col-span-3 bg-white dark:bg-[#151726] p-6 rounded-3xl shadow-sm border border-[#f0f0f5] dark:border-slate-800 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col h-[400px]">
+              <h3 className="font-bold text-[#4e4d82] dark:text-[#a5a5c7] mb-4 tracking-wide">Top Schools Division Offices (SDO) in {selectedRegion || 'Nationwide'}</h3>
+              <div className="flex-1 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={sdoData} margin={{ top: 10, right: 10, left: 10, bottom: 40 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#3a3959" opacity={0.3} />
+                    <XAxis 
+                      dataKey="name" 
+                      tick={{ fill: '#8685ab', fontSize: 11 }} 
+                      axisLine={false} 
+                      tickLine={false}
+                      interval={0}
+                      angle={-25}
+                      textAnchor="end"
+                      dy={15}
+                    />
+                    <YAxis 
+                      tick={{ fill: '#8685ab', fontSize: 12 }} 
+                      axisLine={false} 
+                      tickLine={false} 
+                    />
+                    <Tooltip content={<GenericTooltip dataKeyLabel="Teachers" />} cursor={{ fill: '#3a3959', opacity: 0.1 }} />
+                    <Bar dataKey="value" fill="#4e4d82" radius={[4, 4, 0, 0]}>
+                       {sdoData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={index === 0 ? '#e0b234' : '#4e4d82'} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+          </div>
         </div>
 
         {/* Analytics Section */}
