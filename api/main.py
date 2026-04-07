@@ -1,8 +1,9 @@
 import csv
 import sqlite3
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+import json
 
 app = FastAPI()
 
@@ -15,7 +16,7 @@ app.add_middleware(
 )
 
 DB_FILE = "quickstar.db"
-CSV_FILE = "doststar_nationwide_dataset-TEST copy.csv"
+CSV_FILE = "doststar_nationwide_dataset-TEST.csv"
 
 
 def init_db():
@@ -29,6 +30,7 @@ def init_db():
             region TEXT,
             qualifications TEXT,
             years_of_experience INTEGER,
+            year_joined TEXT,
             subject_specialization TEXT,
             level_classification TEXT
         )
@@ -48,28 +50,34 @@ def init_db():
                     yoe = int(row['Years of Experience'])
                 except (ValueError, KeyError):
                     yoe = 0
+                
+                # Accurately extract all 7 columns
                 batch.append((
                     row.get('SDO', ''),
                     row.get('Region', ''),
                     row.get('Qualifications', ''),
                     yoe,
+                    row.get('Year Joined', ''),
                     row.get('Subject Specialization', ''),
                     row.get('Level Classification', '')
                 ))
+                
+                # Insert in ultra-fast batches of 5000 to prevent looping lag
                 if len(batch) >= 5000:
                     cursor.executemany('''
-                        INSERT INTO teachers (sdo, region, qualifications, years_of_experience, subject_specialization, level_classification)
-                        VALUES (?, ?, ?, ?, ?, ?)
+                        INSERT INTO teachers (sdo, region, qualifications, years_of_experience, year_joined, subject_specialization, level_classification)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
                     ''', batch)
                     conn.commit()
                     total += len(batch)
                     print(f"[QuickSTAR] Inserted {total} rows...")
                     batch = []
 
+            # Flush the remaining items
             if batch:
                 cursor.executemany('''
-                    INSERT INTO teachers (sdo, region, qualifications, years_of_experience, subject_specialization, level_classification)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO teachers (sdo, region, qualifications, years_of_experience, year_joined, subject_specialization, level_classification)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                 ''', batch)
                 conn.commit()
                 total += len(batch)
@@ -92,10 +100,15 @@ def get_data():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+    
+    # Retrieve all properly structured data
     cursor.execute(
         'SELECT sdo, region, qualifications, years_of_experience, '
-        'subject_specialization, level_classification FROM teachers'
+        'year_joined, subject_specialization, level_classification FROM teachers'
     )
     rows = cursor.fetchall()
     conn.close()
-    return [dict(row) for row in rows]
+    
+    # Bypass FastAPI's slow Pydantic serialization for 126k rows
+    data = [dict(row) for row in rows]
+    return Response(content=json.dumps(data), media_type="application/json")
