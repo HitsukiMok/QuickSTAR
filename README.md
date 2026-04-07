@@ -17,7 +17,7 @@ To empower the DOST STAR Program and create actionable, data-driven insights for
 Our solution bridges STEM and sustainability for a better tomorrow through:
 
 - **AI Chatbot**: An integrated assistant for explaining data, inquiring about in-depth details, and providing strategic context.
-- **Hoverable Data Visualizations**: Discover demographics per region in the Philippines through interactive charts and map placeholders.
+- **Hoverable Data Visualizations**: Discover demographics per region in the Philippines through interactive charts and interactive map, utilizing simplemap's SVG & .
 - **Centralized Database Hub**: A single, clean source of truth mapping thousands of STAR teachers nationwide.
 - **Data Summary and Actionable Insights**: Automated AI-based suggestions based on what the data is telling us, why the current conditions exist, and how management might resolve regional gaps effectively.
 
@@ -63,7 +63,6 @@ The system processes sensitive teacher and regional datasets, requiring secure d
 ---
 
 
-<<<<<<< HEAD
 ## UI Screenshots
 
 ### Landing Page
@@ -74,20 +73,6 @@ The system processes sensitive teacher and regional datasets, requiring secure d
 
 ### Dashboard Interface (Analytics & Regional Map)
 *(Insert your newest local screenshot showing the map and Deep Dive Analytics here)*
-=======
-## UI Screenshot
-### Landing Page
-<img width="1837" height="873" alt="image" src="https://github.com/user-attachments/assets/50157e0d-f6ce-4a69-a109-a6204ee63685" />
-
-
-### About Section
-<img width="1512" height="850" alt="image" src="https://github.com/user-attachments/assets/abc43466-a88b-4421-a596-eb9684f9ef15" />
-
-
-### Dashboard Interface
-
-
->>>>>>> 468df4548bb8e530469ff9ba65de192cedbd8fc4
 
 ---
 
