@@ -101,7 +101,10 @@ export default function Dashboard({ darkMode, toggleDarkMode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/data')
+    // Dynamic URL for Vercel vs Local
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    
+    fetch(`${apiUrl}/api/data`)
       .then(res => res.json())
       .then(data => {
         setRawData(data);
