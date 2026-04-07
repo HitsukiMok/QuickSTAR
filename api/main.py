@@ -3,26 +3,25 @@ import sqlite3
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Since it's a fast-paced hackathon
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 DB_FILE = "quickstar.db"
-CSV_FILE = "doststar_nationwide_dataset-TEST.csv"
+CSV_FILE = "doststar_nationwide_dataset-TEST copy.csv"
+
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    
-    # Create table
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS teachers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,48 +33,69 @@ def init_db():
             level_classification TEXT
         )
     ''')
-    
-    # Check if data exists
+
     cursor.execute('SELECT COUNT(*) FROM teachers')
-    if cursor.fetchone()[0] == 0:
+    count = cursor.fetchone()[0]
+
+    if count == 0:
+        print(f"[QuickSTAR] Ingesting CSV: {CSV_FILE}")
         with open(CSV_FILE, mode='r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
-            data_to_insert = []
+            batch = []
+            total = 0
             for row in reader:
-                data_to_insert.append((
-                    row['SDO'],
-                    row['Region'],
-                    row['Qualifications'],
-                    int(row['Years of Experience']),
-                    row['Subject Specialization'],
-                    row['Level Classification']
+                try:
+                    yoe = int(row['Years of Experience'])
+                except (ValueError, KeyError):
+                    yoe = 0
+                batch.append((
+                    row.get('SDO', ''),
+                    row.get('Region', ''),
+                    row.get('Qualifications', ''),
+                    yoe,
+                    row.get('Subject Specialization', ''),
+                    row.get('Level Classification', '')
                 ))
-            
-            cursor.executemany('''
-                INSERT INTO teachers (
-                    sdo, region, qualifications, years_of_experience, subject_specialization, level_classification
-                ) VALUES (?, ?, ?, ?, ?, ?)
-            ''', data_to_insert)
-            conn.commit()
+                if len(batch) >= 5000:
+                    cursor.executemany('''
+                        INSERT INTO teachers (sdo, region, qualifications, years_of_experience, subject_specialization, level_classification)
+                        VALUES (?, ?, ?, ?, ?, ?)
+                    ''', batch)
+                    conn.commit()
+                    total += len(batch)
+                    print(f"[QuickSTAR] Inserted {total} rows...")
+                    batch = []
+
+            if batch:
+                cursor.executemany('''
+                    INSERT INTO teachers (sdo, region, qualifications, years_of_experience, subject_specialization, level_classification)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', batch)
+                conn.commit()
+                total += len(batch)
+
+        print(f"[QuickSTAR] Done! Total rows: {total}")
+    else:
+        print(f"[QuickSTAR] DB already has {count} rows, skipping CSV ingest.")
+
     conn.close()
+
 
 @app.on_event("startup")
 def startup_event():
     init_db()
 
+
 @app.get("/api/data")
 def get_data():
+    """Return all teacher records as a JSON array."""
     conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM teachers')
+    cursor.execute(
+        'SELECT sdo, region, qualifications, years_of_experience, '
+        'subject_specialization, level_classification FROM teachers'
+    )
     rows = cursor.fetchall()
-    
-    # Get column names
-    column_names = [description[0] for description in cursor.description]
-    
-    result = []
-    for row in rows:
-        result.append(dict(zip(column_names, row)))
-    
     conn.close()
-    return result
+    return [dict(row) for row in rows]
