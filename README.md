@@ -8,6 +8,9 @@ Welcome to the **QuickSTAR Dashboard** repository, a unified, intelligent platfo
 
 To empower the DOST STAR Program and create actionable, data-driven insights for educators, our team prioritizes a stack that is optimized for rapid prototyping while not losing out on the performance and scalability aspect. The architecture is designed to handle complex data visualization while maintaining a highly accessible and friendly user interface for teachers, administrators, and common citizens who are interested in analyzing nationwide data.
 
+> [!IMPORTANT]
+> **Prototype Disclaimer (AI Integration):** QuickSTAR is currently implemented as a functional MVP for hackathon demonstration. While the backend database ingestion, interactive geospatial map, and deep-dive analytics engines are completely functional and actively process the real 126k+ row dataset (this dataset is also a mock version for testing.), **the AI-driven intelligence layer (the "Data Says" feature, semantic insights, and Chatbot) is currently conceptual and mocked.** These mock implementations serve to vividly demonstrate the intended final user experience, showcasing how the ecosystem will eventually integrate a live LLM model to translate cold data into direct, actionable policy steps for administrators.
+
 ---
 
 ##  Features & Solution
@@ -58,6 +61,21 @@ The system processes sensitive teacher and regional datasets, requiring secure d
 - **AI Analytics**: AI-generated insights may carry risks related to bias or inaccuracies, so outputs will be positioned as decision-support tools and subject to human validation to ensure reliability and accountability.
 
 ---
+
+
+## UI Screenshots
+
+### Landing Page
+<img width="1837" height="873" alt="Landing Page" src="https://github.com/user-attachments/assets/50157e0d-f6ce-4a69-a109-a6204ee63685" />
+
+### About Section
+<img width="1512" height="850" alt="About Section" src="https://github.com/user-attachments/assets/abc43466-a88b-4421-a596-eb9684f9ef15" />
+
+### Dashboard Interface (Analytics & Regional Map)
+*(Insert your newest local screenshot showing the map and Deep Dive Analytics here)*
+
+---
+
 
 ##  File Structure
 
